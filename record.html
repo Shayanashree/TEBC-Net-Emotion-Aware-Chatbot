@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Record Answer</title>
+    <style>
+        body {
+            background: url("{{ url_for('static', filename='images/2.webp') }}") no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            max-width: 700px;
+        }
+        h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        video {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: 640px;
+            height: 480px;
+        }
+        .button {
+            background-color: #8b4513;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .button:hover:enabled {
+            background-color: #a0522d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎥 Record Your Answer</h2>
+        <video muted id="video" autoplay></video>
+        <div>
+            <button id="startRecording" class="button">Start Recording</button>
+            <button id="stopRecording" class="button" disabled>Stop Recording</button>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const startRecordingButton = document.getElementById('startRecording');
+        const stopRecordingButton = document.getElementById('stopRecording');
+
+        let mediaRecorder;
+        let recordedBlobs = [];
+
+        const constraints = { video: true, audio: true };
+
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                video.srcObject = stream;
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = event => {
+                    recordedBlobs.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+                    const formData = new FormData();
+                    formData.append('video', blob, 'recording.webm');
+
+                    fetch('/save-video', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Video saved successfully');
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const questionNo = parseInt(urlParams.get('question_no'));
+                            const nextQuestionNo = questionNo + 1;
+                            window.location.href = `/question/${nextQuestionNo}`;
+                        } else {
+                            console.error('Error saving video');
+                        }
+                    })
+                    .catch(error => console.error('Error saving video:', error));
+
+                    recordedBlobs = [];
+                };
+
+                startRecordingButton.addEventListener('click', () => {
+                    mediaRecorder.start();
+                    startRecordingButton.disabled = true;
+                    stopRecordingButton.disabled = false;
+                });
+
+                stopRecordingButton.addEventListener('click', () => {
+                    mediaRecorder.stop();
+                    startRecordingButton.disabled = false;
+                    stopRecordingButton.disabled = true;
+                });
+            })
+            .catch(error => {
+                console.error('Error accessing webcam:', error);
+            });
+    </script>
+</body>
+</html>

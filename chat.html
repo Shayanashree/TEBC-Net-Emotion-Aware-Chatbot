@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emotion Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f9; }
+        .chatbox { width: 500px; margin: 40px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1);}
+        .messages { height: 400px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #fafafa;}
+        .user { text-align: right; color: blue; margin: 5px; }
+        .bot { text-align: left; color: green; margin: 5px; }
+        input { width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; border: none; background: #28a745; color: white; border-radius: 8px; cursor: pointer; }
+        button:hover { background: #218838; }
+    </style>
+</head>
+<body>
+    <div class="chatbox">
+        <h2>🤖 Emotion Chatbot</h2>
+        <div class="messages" id="chat"></div>
+        <br>
+        <input type="text" id="message" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            let msg = document.getElementById("message").value;
+            if (msg.trim() === "") return;
+
+            let chat = document.getElementById("chat");
+            chat.innerHTML += "<div class='user'><b>You:</b> " + msg + "</div>";
+            document.getElementById("message").value = "";
+
+            fetch("/get", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chat.innerHTML += "<div class='bot'><b>Bot ("+data.emotion+"):</b> " + data.response + "</div>";
+                chat.scrollTop = chat.scrollHeight;
+            });
+        }
+    </script>
+</body>
+</html>

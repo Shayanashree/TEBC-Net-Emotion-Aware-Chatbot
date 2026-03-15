@@ -1,0 +1,7 @@
+flask
+opencv-python
+torch
+transformers
+numpy
+pandas
+scikit-learn

@@ -5,3 +5,4 @@ transformers
 numpy
 pandas
 scikit-learn
+keras

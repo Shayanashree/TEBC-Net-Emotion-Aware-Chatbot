@@ -2,7 +2,6 @@
 
 flask
 opencv-python
-torch==2.2.2+cpu
 transformers
 numpy
 pandas

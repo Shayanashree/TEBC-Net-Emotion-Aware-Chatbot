@@ -7,6 +7,18 @@ from transformers import BertTokenizer, BertModel
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import random
+import gdown
+
+MODEL_PATH = "bert_emotion_classifier.pth"
+
+if not os.path.exists(MODEL_PATH):
+    try:
+        print("Downloading model from Google Drive...")
+        url = "https://drive.google.com/uc?id=1Ygnh3C2pjUQPlil7ni5LIolEs-iYwhs7"
+        gdown.download(url, MODEL_PATH, quiet=False)
+        print("Model downloaded successfully!")
+    except Exception as e:
+        print("Error downloading model:", e)
 
 from main import run as run_models
 

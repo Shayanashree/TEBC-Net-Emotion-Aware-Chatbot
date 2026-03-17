@@ -2,6 +2,7 @@
 
 flask
 opencv-python
+tourch
 transformers
 numpy
 pandas

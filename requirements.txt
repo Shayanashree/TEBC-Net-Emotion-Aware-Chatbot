@@ -2,9 +2,10 @@
 
 flask
 opencv-python
-tourch
+torch==2.10.0+cpu
 transformers
 numpy
 pandas
 scikit-learn
+gdown
 

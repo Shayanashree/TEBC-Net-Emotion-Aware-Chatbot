@@ -8,4 +8,5 @@ numpy
 pandas
 scikit-learn
 gdown
+librosa
 
